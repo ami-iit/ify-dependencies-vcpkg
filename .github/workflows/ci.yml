@@ -42,7 +42,7 @@ jobs:
     - name: Install vcpkg ports
       shell: bash
       run: |
-        /c/ify-deps/vcpkg/vcpkg.exe install --triplet x64-windows-static qt5-base[latest]
+        /c/ify-deps/vcpkg/vcpkg.exe install --triplet x64-windows-static catch2 qt5-base[latest]
 
     # Remove temporary files https://github.com/Microsoft/vcpkg/blob/master/docs/about/faq.md#how-can-i-remove-temporary-files
     # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2 
