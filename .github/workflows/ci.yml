@@ -34,7 +34,7 @@ jobs:
         mkdir C:/ify-deps
         cd C:/ify-deps
         cd /c/ify-deps
-        https://github.com/Microsoft/vcpkg
+        git clone https://github.com/Microsoft/vcpkg
         cd vcpkg
         git checkout ${vcpkg_TAG}
         C:/robotology/vcpkg/bootstrap-vcpkg.sh
