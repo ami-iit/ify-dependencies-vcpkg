@@ -1,18 +1,18 @@
 name: CI
 
-on: 
+on:
   push:
   pull_request:
   release:
     types: [published]
-  
+
 env:
   vcpkg_TAG: 5852144908b2c714be6f0d343f1de01ca2ec7758
 
 jobs:
   build:
     # We would like to build with v140 toolset to be compatible with both VS2017, 2019
-    # But that will only be avaiilable in late november: https://github.com/actions/virtual-environments/issues/68  
+    # But that will only be avaiilable in late november: https://github.com/actions/virtual-environments/issues/68
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -21,17 +21,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    
-    - name: Check free space 
-      shell: bash 
+
+    - name: Check free space
+      shell: bash
       run: |
         df -h
-  
+
     # Workaround for https://github.community/t5/GitHub-Actions/Windows-tests-worked-yesterday-broken-today/td-p/43574
     - name: Override bash shell PATH (windows-latest)
       if: matrix.os == 'windows-2019'
       run: echo "::add-path::C:\Program Files\Git\bin"
-    
+
     - name: Download custom vcpkg and additional ports [Windows]
       if: matrix.os == 'windows-2019'
       shell: bash
@@ -44,7 +44,7 @@ jobs:
         cd vcpkg
         git checkout ${vcpkg_TAG}
         ./bootstrap-vcpkg.sh
-        
+
     - name: Download custom vcpkg and additional ports [macOS]
       if: matrix.os == 'macOS-latest'
       shell: bash
@@ -56,14 +56,14 @@ jobs:
         cd vcpkg
         git checkout ${vcpkg_TAG}
         ./bootstrap-vcpkg.sh
-       
-       
+
+
     - name: Install vcpkg ports [Windows]
       if: matrix.os == 'windows-2019'
       shell: bash
       run: |
         /c/ify-deps/vcpkg/vcpkg.exe install --triplet x64-windows-static catch2 qt5-base[latest] qt5-serialport
-        
+
     - name: Install vcpkg ports [macOS]
       if: matrix.os == 'macOS-latest'
       shell: bash
@@ -71,38 +71,38 @@ jobs:
         /ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport
 
     # Remove temporary files https://github.com/Microsoft/vcpkg/blob/master/docs/about/faq.md#how-can-i-remove-temporary-files
-    # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2 
-    # See https://github.com/microsoft/vcpkg/issues/10365  
+    # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2
+    # See https://github.com/microsoft/vcpkg/issues/10365
     - name: Cleanup vcpkg temporary directories [Windows]
       if: matrix.os == 'windows-2019'
-      shell: cmd 
+      shell: cmd
       run: |
         RMDIR /Q/S C:\ify-deps\vcpkg\buildtrees
         RMDIR /Q/S C:\ify-deps\vcpkg\packages
         RMDIR /Q/S C:\ify-deps\vcpkg\downloads
-        
+
     - name: Cleanup vcpkg temporary directories [macOS]
       if: matrix.os == 'macOS-latest'
-      shell: bash 
+      shell: bash
       run: |
         rm -rf /ify-deps/vcpkg/buildtrees
         rm -rf /ify-deps/vcpkg/packages
         rf -rf /ify-deps/vcpkg/downloads
 
     - name: Prepare release file [Windows]
-      if: (github.event_name == 'release' &&  matrix.os == 'windows-2019)
-      shell: cmd 
+      if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
+      shell: cmd
       run: |
         7z a ify-deps-x64-windows-static.zip C:\ify-deps
-        
+
     - name: Prepare release file [macOS]
-      if: (github.event_name == 'release' &&  matrix.os == 'macOS-latest)
-      shell: bash 
+      if: (github.event_name == 'release' &&  matrix.os == 'macOS-latest')
+      shell: bash
       run: |
         7z a ify-deps-x64-osx.zip /ify-deps
-        
+
     - name: Upload Release Asset [Windows]
-      if: (github.event_name == 'release' &&  matrix.os == 'windows-2019)
+      if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
@@ -111,10 +111,9 @@ jobs:
           asset_path: ./ify-deps-x64-windows-static.zip
           asset_name: ify-deps-x64-windows-static.zip
           asset_content_type: application/zip
-          
-          
+
     - name: Upload Release Asset [macOS]
-      if: (github.event_name == 'release' &&  matrix.os == 'macOS-latest)
+      if: (github.event_name == 'release' &&  matrix.os == 'macOS-latest')
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
