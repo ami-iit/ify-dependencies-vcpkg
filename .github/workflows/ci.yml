@@ -50,8 +50,8 @@ jobs:
       shell: bash
       run: |
         brew install p7zip
-        mkdir /ify-deps
-        cd /ify-deps
+        mkdir ify-deps
+        cd ify-deps
         git clone https://github.com/Microsoft/vcpkg
         cd vcpkg
         git checkout ${vcpkg_TAG}
@@ -68,7 +68,7 @@ jobs:
       if: matrix.os == 'macOS-latest'
       shell: bash
       run: |
-        /ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport
+        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport
 
     # Remove temporary files https://github.com/Microsoft/vcpkg/blob/master/docs/about/faq.md#how-can-i-remove-temporary-files
     # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2
@@ -85,9 +85,9 @@ jobs:
       if: matrix.os == 'macOS-latest'
       shell: bash
       run: |
-        rm -rf /ify-deps/vcpkg/buildtrees
-        rm -rf /ify-deps/vcpkg/packages
-        rf -rf /ify-deps/vcpkg/downloads
+        rm -rf ./ify-deps/vcpkg/buildtrees
+        rm -rf ./ify-deps/vcpkg/packages
+        rf -rf ./ify-deps/vcpkg/downloads
 
     - name: Prepare release file [Windows]
       if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
@@ -99,7 +99,7 @@ jobs:
       if: (github.event_name == 'release' &&  matrix.os == 'macOS-latest')
       shell: bash
       run: |
-        7z a ify-deps-x64-osx.zip /ify-deps
+        7z a ify-deps-x64-osx.zip ./ify-deps
 
     - name: Upload Release Asset [Windows]
       if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
