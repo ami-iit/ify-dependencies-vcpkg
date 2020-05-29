@@ -87,7 +87,7 @@ jobs:
       run: |
         rm -rf ./ify-deps/vcpkg/buildtrees
         rm -rf ./ify-deps/vcpkg/packages
-        rf -rf ./ify-deps/vcpkg/downloads
+        rm -rf ./ify-deps/vcpkg/downloads
 
     - name: Prepare release file [Windows]
       if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
