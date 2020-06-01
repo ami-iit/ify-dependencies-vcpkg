@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         build_type: [Release]
-        os: [windows-2019, macOS-latest]
+        os: [windows-2019, macOS-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v1
@@ -32,6 +32,13 @@ jobs:
       if: matrix.os == 'windows-2019'
       run: echo "::add-path::C:\Program Files\Git\bin"
 
+    # Remove apt repos that are known to break from time to time
+    # See https://github.com/actions/virtual-environments/issues/323
+    - name: Remove broken apt repos [Ubuntu]
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        for apt_file in `grep -lr microsoft /etc/apt/sources.list.d/`; do sudo rm $apt_file; done
+
     - name: Download custom vcpkg and additional ports [Windows]
       if: matrix.os == 'windows-2019'
       shell: bash
@@ -45,11 +52,23 @@ jobs:
         git checkout ${vcpkg_TAG}
         ./bootstrap-vcpkg.sh
 
-    - name: Download custom vcpkg and additional ports [macOS]
+    - name: Download dependencies [macOS]
       if: matrix.os == 'macOS-latest'
       shell: bash
       run: |
         brew install p7zip
+        
+    - name: Download dependencies [linux]
+      if: matrix.os == 'ubuntu-latest'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install p7zip
+        
+    - name: Download custom vcpkg and additional ports [macOS / linux]
+      if: (matrix.os == 'macOS-latest' || matrix.os == 'ubuntu-latest')
+      shell: bash
+      run: |
         mkdir ify-deps
         cd ify-deps
         git clone https://github.com/Microsoft/vcpkg
@@ -69,6 +88,12 @@ jobs:
       shell: bash
       run: |
         ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport
+        
+    - name: Install vcpkg ports [linux]
+      if: matrix.os == 'ubuntu-latest'
+      shell: bash
+      run: |
+        ./ify-deps/vcpkg/vcpkg install --triplet x64-linux catch2 qt5-base[latest] qt5-serialport   
 
     # Remove temporary files https://github.com/Microsoft/vcpkg/blob/master/docs/about/faq.md#how-can-i-remove-temporary-files
     # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2
@@ -82,7 +107,7 @@ jobs:
         RMDIR /Q/S C:\ify-deps\vcpkg\downloads
 
     - name: Cleanup vcpkg temporary directories [macOS]
-      if: matrix.os == 'macOS-latest'
+      if: (matrix.os == 'macOS-latest' || matrix.os == 'ubuntu-latest')
       shell: bash
       run: |
         rm -rf ./ify-deps/vcpkg/buildtrees
@@ -100,6 +125,12 @@ jobs:
       shell: bash
       run: |
         7z a ify-deps-x64-osx.zip ./ify-deps
+        
+    - name: Prepare release file [linux]
+      if: (github.event_name == 'release' &&  matrix.os == 'ubuntu-latest')
+      shell: bash
+      run: |
+        7z a ify-deps-x64-linux.zip ./ify-deps    
 
     - name: Upload Release Asset [Windows]
       if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
@@ -122,3 +153,15 @@ jobs:
           asset_path: ./ify-deps-x64-osx.zip
           asset_name: ify-deps-x64-osx.zip
           asset_content_type: application/zip
+          
+          
+    - name: Upload Release Asset [linux]
+      if: (github.event_name == 'release' &&  matrix.os == 'ubuntu-latest')
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./ify-deps-x64-linux.zip
+          asset_name: ify-deps-x64-linux.zip
+          asset_content_type: application/zip      
