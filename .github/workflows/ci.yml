@@ -63,7 +63,7 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install build-essential cmake p7zip
+        sudo apt-get install build-essential cmake libx11-dev libmesa-dev libxi-dev libxext-dev p7zip
         
     - name: Download custom vcpkg and additional ports [macOS / linux]
       if: (matrix.os == 'macOS-latest' || matrix.os == 'ubuntu-latest')
@@ -106,7 +106,7 @@ jobs:
         RMDIR /Q/S C:\ify-deps\vcpkg\packages
         RMDIR /Q/S C:\ify-deps\vcpkg\downloads
 
-    - name: Cleanup vcpkg temporary directories [macOS]
+    - name: Cleanup vcpkg temporary directories [macOS / linux]
       if: (matrix.os == 'macOS-latest' || matrix.os == 'ubuntu-latest')
       shell: bash
       run: |
