@@ -63,7 +63,7 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install p7zip
+        sudo apt-get install build-essential cmake p7zip
         
     - name: Download custom vcpkg and additional ports [macOS / linux]
       if: (matrix.os == 'macOS-latest' || matrix.os == 'ubuntu-latest')
