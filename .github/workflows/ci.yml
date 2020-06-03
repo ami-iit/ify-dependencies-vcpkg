@@ -63,7 +63,7 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install build-essential cmake libx11-dev libgl1-mesa-dev libglu1-mesa-dev libx11-xcb-dev libxi-dev libxext-dev bison flex p7zip
+        sudo apt-get install build-essential cmake perl python git p7zip '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev flex bison gperf libicu-dev libxslt-dev ruby
         
     - name: Download custom vcpkg and additional ports [macOS / linux]
       if: (matrix.os == 'macOS-latest' || matrix.os == 'ubuntu-latest')
