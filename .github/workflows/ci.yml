@@ -81,19 +81,19 @@ jobs:
       if: matrix.os == 'windows-2019'
       shell: bash
       run: |
-        /c/ify-deps/vcpkg/vcpkg.exe install --triplet x64-windows-static catch2 qt5-base[latest] qt5-serialport
+        /c/ify-deps/vcpkg/vcpkg.exe install --triplet x64-windows-static catch2 qt5-base[latest] qt5-serialport qt5-tools
 
     - name: Install vcpkg ports [macOS]
       if: matrix.os == 'macOS-latest'
       shell: bash
       run: |
-        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport
+        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport qt5-tools
         
     - name: Install vcpkg ports [linux]
       if: matrix.os == 'ubuntu-latest'
       shell: bash
       run: |
-        ./ify-deps/vcpkg/vcpkg install --triplet x64-linux catch2 qt5-base[latest] qt5-serialport   
+        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport qt5-tools   
 
     # Remove temporary files https://github.com/Microsoft/vcpkg/blob/master/docs/about/faq.md#how-can-i-remove-temporary-files
     # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2
