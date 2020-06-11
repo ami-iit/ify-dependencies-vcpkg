@@ -41,9 +41,9 @@ jobs:
 
     - name: Free disk space
       # https://github.com/actions/virtual-environments/issues/709
-      if: matrix.os == 'ubuntu-latest'  
+      if: matrix.os == 'ubuntu-latest'
       run: |
-        sudo apt-get clean
+        sh ./.github/workflows/free_disk_space.sh
         df -h
 
     - name: Download custom vcpkg and additional ports [Windows]
@@ -64,14 +64,14 @@ jobs:
       shell: bash
       run: |
         brew install p7zip
-        
+
     - name: Download dependencies [linux]
       if: matrix.os == 'ubuntu-latest'
       shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install build-essential cmake perl python git p7zip '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev flex bison gperf libicu-dev libxslt-dev ruby
-        
+
     - name: Download custom vcpkg and additional ports [macOS / linux]
       if: (matrix.os == 'macOS-latest' || matrix.os == 'ubuntu-latest')
       shell: bash
@@ -95,12 +95,12 @@ jobs:
       shell: bash
       run: |
         ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport qt5-tools
-        
+
     - name: Install vcpkg ports [linux]
       if: matrix.os == 'ubuntu-latest'
       shell: bash
       run: |
-        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport qt5-tools   
+        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport qt5-tools
 
     # Remove temporary files https://github.com/Microsoft/vcpkg/blob/master/docs/about/faq.md#how-can-i-remove-temporary-files
     # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2
@@ -132,12 +132,12 @@ jobs:
       shell: bash
       run: |
         7z a ify-deps-x64-osx.zip ./ify-deps
-        
+
     - name: Prepare release file [linux]
       if: (github.event_name == 'release' &&  matrix.os == 'ubuntu-latest')
       shell: bash
       run: |
-        7z a ify-deps-x64-linux.zip ./ify-deps    
+        7z a ify-deps-x64-linux.zip ./ify-deps
 
     - name: Upload Release Asset [Windows]
       if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
@@ -160,8 +160,8 @@ jobs:
           asset_path: ./ify-deps-x64-osx.zip
           asset_name: ify-deps-x64-osx.zip
           asset_content_type: application/zip
-          
-          
+
+
     - name: Upload Release Asset [linux]
       if: (github.event_name == 'release' &&  matrix.os == 'ubuntu-latest')
       uses: actions/upload-release-asset@v1.0.1
@@ -171,4 +171,4 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./ify-deps-x64-linux.zip
           asset_name: ify-deps-x64-linux.zip
-          asset_content_type: application/zip      
+          asset_content_type: application/zip
