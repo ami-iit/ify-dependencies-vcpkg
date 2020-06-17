@@ -62,13 +62,13 @@ jobs:
       if: matrix.os == 'windows-2019'
       shell: bash
       run: |
-        /c/ify-deps/vcpkg/vcpkg.exe install --triplet x64-windows-static catch2 qt5-base[latest] qt5-serialport qt5-tools
+        /c/ify-deps/vcpkg/vcpkg.exe install --triplet x64-windows-static catch2
 
     - name: Install vcpkg ports [macOS]
       if: matrix.os == 'macOS-latest'
       shell: bash
       run: |
-        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2 qt5-base[latest] qt5-serialport qt5-tools
+        ./ify-deps/vcpkg/vcpkg install --triplet x64-osx catch2
 
     # Remove temporary files https://github.com/Microsoft/vcpkg/blob/master/docs/about/faq.md#how-can-i-remove-temporary-files
     # For some reason doing using git bash to do rm -rf fails for icu's port buildtrees, probably for the use of msys2
@@ -80,7 +80,6 @@ jobs:
         RMDIR /Q/S C:\ify-deps\vcpkg\buildtrees
         RMDIR /Q/S C:\ify-deps\vcpkg\packages
         RMDIR /Q/S C:\ify-deps\vcpkg\downloads
-        RMDIR /Q/S C:\ify-deps\vcpkg\installed\x64-windows-static\tools\qt5\debug
 
     - name: Cleanup vcpkg temporary directories [macOS]
       if: matrix.os == 'macOS-latest'
@@ -89,7 +88,6 @@ jobs:
         rm -rf ./ify-deps/vcpkg/buildtrees
         rm -rf ./ify-deps/vcpkg/packages
         rm -rf ./ify-deps/vcpkg/downloads
-        rm -rf ./ify-deps/vcpkg/installed/x64-osx/tools/qt5/debug
 
     - name: Prepare release file [Windows]
       if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
