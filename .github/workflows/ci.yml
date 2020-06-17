@@ -80,6 +80,7 @@ jobs:
         RMDIR /Q/S C:\ify-deps\vcpkg\buildtrees
         RMDIR /Q/S C:\ify-deps\vcpkg\packages
         RMDIR /Q/S C:\ify-deps\vcpkg\downloads
+        RMDIR /Q/S C:\ify-deps\vcpkg\installed\x64-windows-static\tools\qt5\debug
 
     - name: Cleanup vcpkg temporary directories [macOS]
       if: matrix.os == 'macOS-latest'
@@ -88,6 +89,7 @@ jobs:
         rm -rf ./ify-deps/vcpkg/buildtrees
         rm -rf ./ify-deps/vcpkg/packages
         rm -rf ./ify-deps/vcpkg/downloads
+        rm -rf ./ify-deps/vcpkg/installed/x64-osx/tools/qt5/debug
 
     - name: Prepare release file [Windows]
       if: (github.event_name == 'release' &&  matrix.os == 'windows-2019')
